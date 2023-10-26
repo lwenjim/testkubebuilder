@@ -26,6 +26,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 // log is for logging in this package.
@@ -46,8 +47,6 @@ var _ webhook.Defaulter = &CronJob{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *CronJob) Default() {
 	cronjoblog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
 
 	if r.Spec.ConcurrencyPolicy == "" {
 		r.Spec.ConcurrencyPolicy = AllowConcurrent
@@ -71,42 +70,27 @@ func (r *CronJob) Default() {
 var _ webhook.Validator = &CronJob{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *CronJob) ValidateCreate() error {
+func (r *CronJob) ValidateCreate() (admission.Warnings, error) {
 	cronjoblog.Info("validate create", "name", r.Name)
 
-	// if r.Spec.ConcurrencyPolicy == "" {
-	// 	r.Spec.ConcurrencyPolicy = AllowConcurrent
-	// }
-	// if r.Spec.Suspend == nil {
-	// 	r.Spec.Suspend = new(bool)
-	// }
-	// if r.Spec.SuccessfulJobsHistoryLimit == nil {
-	// 	r.Spec.SuccessfulJobsHistoryLimit = new(int32)
-	// 	*r.Spec.SuccessfulJobsHistoryLimit = 3
-	// }
-	// if r.Spec.FailedJobsHistoryLimit == nil {
-	// 	r.Spec.FailedJobsHistoryLimit = new(int32)
-	// 	*r.Spec.FailedJobsHistoryLimit = 1
-	// }
-
 	// TODO(user): fill in your validation logic upon object creation.
-	return r.validateCronJob()
+	return nil, r.validateCronJob()
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *CronJob) ValidateUpdate(old runtime.Object) error {
+func (r *CronJob) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	cronjoblog.Info("validate update", "name", r.Name)
 
 	// TODO(user): fill in your validation logic upon object update.
-	return r.validateCronJob()
+	return nil, r.validateCronJob()
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *CronJob) ValidateDelete() error {
+func (r *CronJob) ValidateDelete() (admission.Warnings, error) {
 	cronjoblog.Info("validate delete", "name", r.Name)
 
 	// TODO(user): fill in your validation logic upon object deletion.
-	return r.validateCronJob()
+	return nil, r.validateCronJob()
 }
 
 func (r *CronJob) validateCronJob() error {
