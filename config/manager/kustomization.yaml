@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: lwenjim/project
-  newTag: v1.9
+  newTag: v2.0
