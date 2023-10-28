@@ -33,6 +33,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ref "k8s.io/client-go/tools/reference"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -50,6 +51,7 @@ type CronJobReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 	Clock
+	Recorder record.EventRecorder
 }
 
 /*
@@ -79,6 +81,7 @@ a couple more [markers](/reference/markers/rbac.md).
 //+kubebuilder:rbac:groups=batch.tutorial.kubebuilder.io,resources=cronjobs/finalizers,verbs=update
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=batch,resources=jobs/status,verbs=get
+//+kubebuilder:rbac:groups=core,resources=events,verbs=create;patch
 
 /*
 Now, we get to the heart of the controller -- the reconciler logic.
@@ -551,6 +554,11 @@ func (r *CronJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	log.V(1).Info("created Job for CronJob run", "job", job)
+
+	r.Recorder.Event(&cronJob, "Warning", "Deleting",
+		fmt.Sprintf("Custom Resource %s is being created from the namespace %s",
+			cronJob.Name,
+			cronJob.Namespace))
 
 	/*
 		### 7: Requeue when we either see a running job or it's time for the next scheduled run
